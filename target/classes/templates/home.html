@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Application and Exam System</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="../slick/slick.css">
+<link rel="stylesheet" href="../slick/slick-theme.css">
+
+<link rel="stylesheet" type="text/css" href="../css/bootstrap-3.3.4.css">
+<script src="../js/jquery-2.1.3.min.js"></script>
+<script src="../js/bootstrap-3.3.4.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+
+<style type="text/css">
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .item{
+      margin-top: 55px;
+    }
+    
+    .table tbody {
+    	display:block;
+    	overflow:auto;
+    	height:400px;
+    	width:100%;
+    }
+    
+    .table thead tr {
+    	display:block;
+    	overflow:auto;
+    	width:100%;
+    }
+</style>
+
+</head>
+<body th:object="${questionList}" onload="onloadFunction()">
+  <div class="question-header">
+    <img src="../img/logo.png" height="90%" style="float:left; vertical-align:middle">
+    <div style="line-height:90%; margin-left:45px; vertical-align:middle"><font style="font-size: 70%">Philippine Global Delivery Center</font> 
+      <br/> Application and Exam System
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="question-content center">
+      <p>
+        EXAM QUESTIONS MAINTENANCE
+      </p>
+    </div>
+    <div class="answer-content">
+        <table class="table table-bordered table-striped">
+        	<thead>
+        		<tr>
+        			<th width="100px" style="text-align:center">#</th>
+        			<th width="1000px">Question Description</th>
+        			<th width="200px">Category</th>
+        			<th width="216px">Action</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr th:each="row, rowStat : ${questionList}">
+        			<td width="100px"  style="text-align:center" th:text="${rowStat.count}"></td>
+        			<td width="1000px" th:text="${row.description}"></td>
+        			<td width="200px" th:text="${row.category.description}"></td>
+        			<td width="216px">
+        				<form th:action="@{delete}" method="post">
+        					<input type="hidden" name="id" th:value="${row.id}"/>
+	        				<input type="submit" value="Delete" class="btn btn-danger"/>
+        				</form>
+        				<form th:action="@{edit}" method="post">
+        					<input type="hidden" name="id" th:value="${row.id}"/>
+	        				<input type="submit" value="Edit" class="btn"/>
+        				</form>
+        			</td>
+        		</tr>
+        	</tbody>
+        </table>
+        
+  	</div>
+  </div>
+
+	  <div class="question-footer">
+	    <div style="line-height:150%; margin:5px 15px ; vertical-align:middle; display: inline-block;">
+	      <!-- Applicant: <b><span th:text="${applicantExam.applicant.fullname}" /></b>
+	      <br/> Exam Category: <b><span th:text="${applicantExam.category.description}" /></b> -->
+	    </div>
+	
+	    <div style="line-height:150%; margin:5px 50px ; vertical-align:middle; display: inline-block;">
+	      <!-- Reference #:  <b><span th:text="${applicantExam.refNo}" /></b><br>&nbsp; -->
+	    </div>
+	  </div>
+	<script src="../slick/slick.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+function onloadFunction() {
+	var deleteexception = "[[${deleteexception}]]";
+	if (deleteexception === "true") {
+		alert("Cannot delete, used in an applicant's exam");
+		deleteexception = false;
+	}
+}
+	</script>
+</body>
+
+</html>

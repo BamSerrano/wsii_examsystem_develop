@@ -1,0 +1,351 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Application and Exam System</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="../slick/slick.css">
+<link rel="stylesheet" href="../slick/slick-theme.css">
+
+<link rel="stylesheet" type="text/css" href="../css/bootstrap-3.3.4.css">
+<script src="../js/jquery-2.1.3.min.js"></script>
+<script src="../js/bootstrap-3.3.4.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+
+<style type="text/css">
+html,body {
+	margin: 0;
+	padding: 0;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.slider {
+	width: 750px;
+}
+
+.slick-slide {
+	width: 35px !important;
+	margin: 0px 20px;
+}
+
+.slick-slide img {
+	width: 100%;
+}
+
+.slick-prev:before,.slick-next:before {
+	color: black;
+}
+
+.slick-slide {
+	transition: all ease-in-out .3s;
+	opacity: 1;
+}
+
+.slick-active {
+	opacity: 1;
+}
+
+.slick-current {
+	opacity: 1;
+}
+
+.slick-dots {
+	display: none !important;
+}
+</style>
+</head>
+<body onload="onloadFunction()">
+	<div class="question-header">
+		<img src="../img/logo.png" height="90%"
+			style="float: left; vertical-align: middle">
+		<div
+			style="line-height: 90%; margin-left: 45px; vertical-align: middle">
+			<font style="font-size: 70%">Philippine Global Delivery Center</font>
+			<br /> Application and Exam System
+			<div
+				style="position: fixed; right: 20px; top: 20px; vertical-align: middle;">
+				<p style="display: inline-block" id="demo" />
+			</div>
+		</div>
+	</div>
+	<form action="#" th:action="@{/exam/save}"
+		th:object="${applicantExam}" th:id="questionForm" method="post">
+		<fieldset>
+			<div id="carousel-example-generic"
+				class="carousel slide question-container" data-interval="false">
+				<!-- Indicators -->
+				<ol
+					class="carousel-indicators carousel-indicators-numbers regular slider">
+					<li
+						th:onclick="'javascript:itemIndicator(\''+ ${iterStat.index} +'\');'"
+						data-target="#carousel-example-generic"
+						th:each="detail,iterStat : *{details}"
+						th:data-slide-to="${iterStat.index}"
+						th:id="'indicator' + ${iterStat.index}"><span
+						th:text="${iterStat.index+1}"></span></li>
+				</ol>
+				<!-- Wrapper for slides -->
+				<div class="carousel-inner" role="listbox">
+					<div class="item" th:each="detail,iterStat: *{details}">
+						<div class="question-head">
+							<font style="font-size: 2.5vh"><b style="color: black">Question
+									#<span th:text="${iterStat.index+1}"></span>
+							</b></font>
+						</div>
+						<div class="question-content center">
+							<p>
+								<span th:text="${detail.question.description}"></span>
+								<input type="hidden" th:field="*{details[__${iterStat.index}__].question.id}" th:value="${detail.question.id}" />
+							</p>
+						</div>
+						<div class="answer-content">
+							<font style="font-size: 2.5vh"><b style="color: black">Choice
+									you answer here: </b></font>
+							<p style="margin: 0 0 0" th:each="answer: ${detail.answers}">
+								<input th:type="radio" onclick="storeValues(this.id)"
+									th:field="*{details[__${iterStat.index}__].answerId}"
+									th:value="${answer.id}"> <span
+									th:text="${answer.description}"></span>
+							</p>
+							<br>
+						</div>
+					</div>
+				</div>
+				<!-- Controls -->
+				<a class="left carousel-control" href="#carousel-example-generic"
+					role="button" data-slide="prev"> <span
+					class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+					<span class="sr-only">Previous</span>
+				</a> <a class="right carousel-control" href="#carousel-example-generic"
+					role="button" data-slide="next"> <span
+					class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					<span class="sr-only">Next</span>
+				</a>
+			</div>
+			<div class="question-footer">
+				<div
+					style="line-height: 150%; margin: 5px 15px; vertical-align: middle; display: inline-block;">
+					Applicant: <b><span
+						th:text="${applicantExam.applicant.fullname}" /></span></b> <br /> Exam
+					Category: <b><span
+						th:text="${applicantExam.category.description}" /></span></b>
+				</div>
+				<div
+					style="line-height: 150%; margin: 5px 50px; vertical-align: middle; display: inline-block;">
+					Reference #: <b><span th:text="${applicantExam.refNo}" /></span></b><br>&nbsp;
+				</div>
+				<div
+					style="vertical-align: middle; display: inline-block; right: 20px; top: 15px; position: absolute">
+					<input type="button" class="btn btn-success" data-toggle="modal"
+						data-target="#exampleModal" data-backdrop="static" data-keyboard="false" th:id="finishBtn" th:value="Finish">
+				</div>
+			</div>
+		</fieldset>
+	</form>
+
+	<!-- Modal -->
+	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="exampleModalLabel">Review Your
+						Answer</h4>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" th:object="${applicantExam}">
+					<h5 th:text="${applicantExam.category.description}+' Exam'"></h5>
+					<div th:each="detail,iterStat: *{details}"
+						th:id="question+${iterStat.index+1}">
+						Question #<span
+							th:text="${iterStat.index+1+' '+detail.question.description+' Answer: '}"></span>
+						<span th:id="answer+${iterStat.index+1}"></span>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">Go Back</button>
+					<button id="submitBtn" type="button" class="btn btn-primary">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="exitModal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" 
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="saveModalLabel">Time's up! Your Answers are automatically saved to our database.</h4><br><br>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="../slick/slick.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+function storeValues(objId)  
+{
+	var s = objId.substring(7, 10);
+	var a = parseInt(s);
+  	for(var b=1; b<=4; b++) {
+  		setCookie("details"+a+".answerId"+b, document.getElementById("details"+a+".answerId"+b).checked);
+  	}
+  	$("#indicator"+a).addClass("indicator-done");
+}
+
+$("#finishBtn").on("click",function(){
+	//loop through questions
+	$("div.item").each(function( index, element ) {
+	//identify which radio button is being checked
+	 var el=$(this).find("div.answer-content>p>input[type=radio]:checked");
+     var number=index+1;
+     var ansTxtVal=el.siblings().text();
+     //get the text value associated with the radio button
+     if(ansTxtVal==""){
+     	$("#question"+number).css("color","red");
+     }else{
+ 	 	$("#answer"+number).html(ansTxtVal);
+ 	 	$("#question"+number).css("color","black");
+ 	 }
+	});
+});
+
+$("#submitBtn").on("click",function(){
+	$("#questionForm").submit();
+});
+
+function onloadFunction() {
+	var count = [[${count}]];
+	for(var a=0; a<count; a++) {
+		for(var b=1; b<=4; b++) {
+			document.getElementById("details"+a+".answerId"+b).checked = getCookie("details"+a+".answerId"+b)==="true";
+			if(getCookie("details"+a+".answerId"+b)==="true") {
+				$("#indicator"+a).addClass("indicator-done");
+			}
+		}
+	}
+	var expiryDate = "[[${expiryDate}]]";
+	
+	var curSlide = 0;
+	if(getCookie("curSlide")!=="") {
+		curSlide =  parseInt(getCookie("curSlide"));
+	}
+	
+	/*make first question active*/
+	$('.item').each(function(i) {
+	    if ( i === curSlide ) {
+	       $(this).addClass('active');
+	    }
+	});
+}
+
+function itemIndicator(id) {
+	setCookie("curSlide", id);
+}
+
+function setCookie(name, value)
+{
+  document.cookie=name + "=" + escape(value) + "; path=/; expires=" + (new Date(expiryDate)).toGMTString();
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+
+//document.addEventListener('contextmenu', event => event.preventDefault());
+$(document).keydown(function (event) {
+	//disable element inspection
+    //if (event.keyCode == 123) { // Prevent F12
+    //    return false;
+    //} else if (event.ctrlKey && event.shiftKey && event.keyCode == 73) { // Prevent Ctrl+Shift+I        
+    //    return false;
+    //}
+  	//disable refresh
+    //if (event.keyCode == 116) { // Prevent F5
+    //    return false;
+    //}
+    
+});
+
+
+
+$(document).on('ready', function() {
+  $(".regular").slick({
+	dots: true,
+	infinite: false,
+	slidesToShow: 10,
+	slidesToScroll: 5
+  });
+});
+
+</script>
+	<script>
+// Set the date we're counting down to
+var expiryDate = "[[${expiryDate}]]";
+var countDownDate = new Date(expiryDate).getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+	
+    // Get todays date and time
+    var now = new Date().getTime();
+    
+    // Find the distance between now an the count down date
+    var distance = countDownDate - now;
+    
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    hours = hours * 60;
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)) + hours;
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+    // Output the result in an element with id="demo"
+    document.getElementById("demo").innerHTML = "<small>Timer : </small>" + minutes + ":" + seconds;
+    
+    // If the count down is over, write some text 
+    if (distance < 0) {
+    	var count = [[${count}]];
+    	for(var a=0; a<count; a++) {
+    		for(var b=1; b<=4; b++) {
+    			if(getCookie("details"+a+".answerId"+b)!="true") {
+    				document.getElementById("details"+a+".answerId"+b).disabled = 'disabled';
+    			}
+    		}
+    	}
+        clearInterval(x);
+        document.getElementById("demo").innerHTML = "Time up. Click <font color='#55ff3b'><small><b>[Finish]</b></small></font> to submit your answers.";
+        var f = document.getElementById('demo');
+        setInterval(function() {
+            f.style.display = (f.style.display == 'none' ? '' : 'none');
+        }, 500);
+        
+        $("#exitModal").modal("show");
+      	setTimeout(function(){$("#questionForm").submit();}, 5000);   
+    }
+}, 1000);
+</script>
+</body>
+
+</html>

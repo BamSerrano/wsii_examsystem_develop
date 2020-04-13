@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ExamApplication<examsystem>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.weserv.application.examsystem.ExamApplication",
+            "projectName": "examsystem",
+            "args": ""
+        }
+    ]
+}
